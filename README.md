@@ -16,7 +16,7 @@ Required:
 Optional:
 
 ```
-proxmox_eth0_ipv4 # (ip which set in /etc/hosts for current hostname) default value = ansible_default_ipv4.address
+proxmox_eth0_ipv4:10.0.0.1 # (ip which set in /etc/hosts for current hostname) default value = ansible_default_ipv4.address
 
 proxmox_base_packages: # Install with apt manager
   - ntp
@@ -26,6 +26,7 @@ proxmox_base_packages: # Install with apt manager
   - vzprocps 
   - open-iscsi 
   - bootlogd
+```
 
 Dependencies
 ------------
