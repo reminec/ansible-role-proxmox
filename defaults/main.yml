@@ -1,0 +1,16 @@
+---
+# defaults file for wotol_proxmox
+
+# /etc/hosts ipv4 hostname mapping
+proxmox_eth0_ipv4: ansible_default_ipv4.address
+
+# Install packages dependencies
+
+proxmox_base_packages:
+  - ntp
+  - lvm2
+  - postfix 
+  - ksm-control-daemon 
+  - vzprocps 
+  - open-iscsi 
+  - bootlogd
