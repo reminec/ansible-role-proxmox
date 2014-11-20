@@ -2,22 +2,36 @@
 # install proxmox VE (part 1)
 #
 
-- name: Ensure has an entry in /etc/hosts which assigns an IPv4 address to that hostname. 
+- name: Ensure has an entry in /etc/hosts which assigns an IPv4 address. 
   lineinfile: "state=present dest=/etc/hosts
   regexp='^{{ proxmox_eth0_ipv4 }}'
-  line='{{ proxmox_eth0_ipv4 }} {{ ansible_hostname }}'"
+  line='{{ proxmox_eth0_ipv4 }} {{ ansible_hostname }} pvelocalhost'"
+
+- name: Ensure hostname is not ont the same line of localhost
+  lineinfile: "state=absent dest=/etc/hosts
+  regexp='localhost.{{ ansible_hostname }}'
+  backup=true"
 
   
 - name: add the Proxmox VE repository
   lineinfile: "state=present dest=/etc/apt/sources.list
   regexp='^deb http://download.proxmox.com'
-  line='deb http://download.proxmox.com/debian wheezy pve'"
+  line='deb http://download.proxmox.com/debian wheezy pve'
+  backup=true"
 
 - name: add the Proxmox VE repository key
   apt_key: url=http://download.proxmox.com/debian/key.asc state=present
 
+- name: check if already installed
+  shell: "grep pve /boot/grub/grub.cfg"
+  register: proxmox_installed
+
+- debug: var=proxmox_installed
+
 - name: run sysupgrade
   apt: update_cache=yes upgrade=dist
+  when: (proxmox_installed.stdout is defined) and (proxmox_installed.stdout.find("pve") == -1)
+
  
 - name: install proxmox VE firmware
   apt: pkg=pve-firmware state=latest
@@ -28,10 +42,12 @@
 - name: set default boot to VE kernel
   lineinfile: "state=present dest=/etc/default/grub
   regexp='^GRUB_DEFAULT='
-  line=GRUB_DEFAULT=2"
+  line=GRUB_DEFAULT=2
+  backup=true"
 
 - name: update grub
   command: update-grub
+  when: (proxmox_installed.stdout is defined) and (proxmox_installed.stdout.find("pve") == -1)
 
 - name: setup IPV4 forwarding for NAT
   lineinfile: "state=present dest=/etc/sysctl.conf
@@ -45,13 +61,16 @@
   async: 0
   poll: 0
   ignore_errors: true
+  when: (proxmox_installed.stdout is defined) and (proxmox_installed.stdout.find("pve") == -1)
 
 - name: wait for shutdown...
   local_action: wait_for host={{ inventory_hostname }} port=22 state=stopped 
+  when: (proxmox_installed.stdout is defined) and (proxmox_installed.stdout.find("pve") == -1)
 
 - name: wait until SSH becomes ready...
   local_action: wait_for host={{ inventory_hostname }} state=started
   sudo: false
+  when: (proxmox_installed.stdout is defined) and (proxmox_installed.stdout.find("pve") == -1)
 
 - name: is it running?
   command: uptime
