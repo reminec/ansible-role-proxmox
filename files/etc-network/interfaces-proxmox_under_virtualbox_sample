@@ -1,0 +1,27 @@
+# network interface settings
+# Managed by ansible playbook
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
+# bridge with virtualbox
+auto eth1
+iface eth1 inet static
+	address  192.168.56.110
+	netmask  255.255.255.0
+	gateway  192.168.56.1
+
+# nat configuration
+auto vmbr0
+iface vmbr0 inet static
+	address  10.10.10.1
+	netmask  255.255.255.0
+	bridge_ports none
+	bridge_stp off
+	bridge_fd 0
+
+	post-up echo 1 > /proc/sys/net/ipv4/ip_forward
+        post-up   iptables -t nat -A POSTROUTING -s '10.10.10.0/24' -o eth0 -j MASQUERADE
+        post-down iptables -t nat -D POSTROUTING -s '10.10.10.0/24' -o eth0 -j MASQUERADE
