@@ -105,5 +105,7 @@
     sha256sum="{{ item.sha256sum }}"
   with_items: proxmox_templates
 
+- name: ensure pve-enterprise repo is disable (need a valid subscription) 
+  synchronize: src="etc-apt-sources.list.d/pve-enterprise.list" dest="pve-entreprise.list"
 
 
