@@ -32,7 +32,7 @@
 - debug: var=proxmox_installed
 
 - name: run sysupgrade
-  apt: update_cache=yes upgrade=dist
+  apt: update_cache=yes upgrade=dist cache_valid_time=600
   when: (proxmox_installed.stdout is defined) and (proxmox_installed.stdout == ''E)
  
 - name: install proxmox VE firmware
@@ -104,8 +104,12 @@
     dest="{{ proxmox_template_path }}/{{ item.filename }}"
     sha256sum="{{ item.sha256sum }}"
   with_items: proxmox_templates
+  tags:
+    - after-reboot
 
 - name: ensure pve-enterprise repo is disable (need a valid subscription) 
-  synchronize: src="etc-apt-sources.list.d/pve-enterprise.list" dest="pve-entreprise.list"
+  synchronize: src="etc-apt-sources.list.d/pve-enterprise.list" dest="/etc/apt/sources.list.d/pve-entreprise.list"
+  tags:
+    - after-reboot
 
 
