@@ -12,7 +12,7 @@ proxmox_base_packages:
   - open-iscsi 
   - bootlogd
 
-proxmox_template_path: /var/lib/vz/template/cache
+proxmox_template_path: "/var/lib/vz/template/cache"
 
 proxmox_templates:
   - { filename: 'debian-7.0-standard_7.0-2_amd64.tar.gz', 
