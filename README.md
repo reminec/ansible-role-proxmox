@@ -8,12 +8,12 @@ By default, disable proxmox pve-enterprise sources.list because we have no subsc
 Requirements
 ------------
 
-...
+library/openvz/openvz
+library/openvz/pvectl
 
 Role Variables
 --------------
 
-Required:
 
 Optional:
 
@@ -77,3 +77,4 @@ Author Information
 ------------------
 
 ...
+
