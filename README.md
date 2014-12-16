@@ -1,4 +1,4 @@
-Role Name
+Wotol Ansible Role Proxmox
 =========
 
 Install proxmox on a fresh debian 7 , reboot it, and create new VM if it provided
@@ -14,10 +14,9 @@ library/openvz/pvectl
 Role Variables
 --------------
 
-
 Optional:
 
-```
+```yaml
 proxmox_eth0_ipv4:10.0.0.1 # (ip which set in /etc/hosts for current hostname) default value = ansible_default_ipv4.address
 
 proxmox_base_packages: # Install with apt manager
