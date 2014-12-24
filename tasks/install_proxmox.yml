@@ -105,4 +105,17 @@
   tags:
     - after-reboot
 
+- name: Modprobe some modules to enable firewall in containers 
+  shell: 'modprobe xt_tcpudp && modprobe ip_conntrack' 
+  tags:
+    - after-reboot
+
+- name: Add ipt_state to iptables modules in vz.conf
+  lineinfile: >
+    state=present 
+    dest=/etc/vz/vz.conf
+    regexp='^IPTABLES='
+    line='IPTABLES="ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length ipt_state"'
+  tags:
+    - after-reboot 
 

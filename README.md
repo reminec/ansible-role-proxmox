@@ -67,6 +67,10 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
          - { role: wotol_proxmox, proxmox_eth0_ipv4 = 10.0.0.1 }
 
+References
+----------
+http://openvz.org/Setting_up_an_iptables_firewall#Setting_up_a_firewall_that_allows_per-container_configuration
+
 License
 -------
 
