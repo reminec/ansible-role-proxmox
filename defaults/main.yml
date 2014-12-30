@@ -18,3 +18,5 @@ proxmox_templates:
   - { filename: 'debian-7.0-standard_7.0-2_amd64.tar.gz', 
       url: 'ftp://download.proxmox.com/appliances/system/debian-7.0-standard_7.0-2_amd64.tar.gz',
       sha256sum: '1d114375beb93940ad296e64d3c1ddfc14d35fb00dfdf40c8eb4f4b70496b3c5' }
+
+pve_containers: []
