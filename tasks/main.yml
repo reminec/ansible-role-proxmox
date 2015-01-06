@@ -1,5 +1,5 @@
 ---
 # install proxmox VE (part 1)
 #
-- include: install_proxmox.yml
+- include: install_proxmox.yml tags=proxmox_install
 - include: openvz.yml
