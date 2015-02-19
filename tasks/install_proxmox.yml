@@ -55,10 +55,12 @@
   apt: pkg=pve-kernel-2.6.32-26-pve state=latest
 
 - name: set default boot to VE kernel
-  lineinfile: "state=present dest=/etc/default/grub
-  regexp='^GRUB_DEFAULT='
-  line=GRUB_DEFAULT=2
-  backup=true"
+  lineinfile: 
+    state=present 
+    dest=/etc/default/grub
+    regexp='^GRUB_DEFAULT='
+    line="GRUB_DEFAULT='Debian GNU/Linux, with Linux 2.6.32-26-pve'"
+    backup=true
 
 - name: update grub
   command: update-grub
