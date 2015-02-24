@@ -1,0 +1,6 @@
+---
+- name: Create default configuration for pveproxy
+  synchronize: 
+    src="etc-default/pveproxy"
+    dest="/etc/default/pveproxy"
+  notify: pveproxy restart

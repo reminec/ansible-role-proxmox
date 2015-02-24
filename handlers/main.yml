@@ -1,2 +1,7 @@
 ---
 # handlers file for wotol_proxmox
+
+- name: pveproxy restart
+  service: 
+    name="pveproxy"
+    state="restarted"

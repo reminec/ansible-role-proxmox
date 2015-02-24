@@ -3,3 +3,5 @@
 #
 - include: install_proxmox.yml tags=proxmox_install
 - include: openvz.yml
+- include: securize.yml tags=proxmox_securize 
+  when: proxmox_restrict_webadmin | default(false)
