@@ -9,8 +9,8 @@ By default, disable proxmox pve-enterprise sources.list because we works with no
 
 ## Requirements
 
-library/pvectl/pvectl [https://github.com/reminec/ansible-library-pvectl]
-library/xml/xml [https://github.com/cmprescott/ansible-xml]
+- library/pvectl/pvectl [https://github.com/reminec/ansible-library-pvectl]
+- library/xml/xml [https://github.com/cmprescott/ansible-xml]
 
 ## Role Variables
 
