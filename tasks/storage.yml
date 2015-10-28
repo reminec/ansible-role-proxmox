@@ -1,0 +1,18 @@
+---
+###########################################################################
+# Heavily inspired by https://github.com/ElaoInfra/ansible-role-openvz.git
+###########################################################################
+- name: storages > Setup storages
+  command: >
+    pvesm add {{ item.id }}
+    -type {{ item.type }}
+    -maxfiles {{ item.maxfiles|default(1) }}
+    {% if item.server is defined %} -server {{ item.server }} {% endif %}
+    {% if item.export is defined %} -export {{ item.export }} {% endif %}
+    {% if item.content is defined %} -content {{ item.content }} {% endif %}
+    {% if item.nodes is defined %} -nodes {{ item.nodes }} {% endif %}
+    {% if item.path is defined %} -path {{ item.path }} {% endif %}
+  with_items: proxmox_storages
+  register: command_result
+  failed_when: "command_result.rc != 0 and 'already defined' not in command_result.stderr"
+  changed_when: "command_result.rc == 0"

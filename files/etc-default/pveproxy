@@ -1,3 +1,0 @@
-ALLOW_FROM="127.0.0.1"
-DENY_FROM="all"
-POLICY="allow"

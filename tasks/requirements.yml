@@ -1,0 +1,29 @@
+- name: check if already installed
+  shell: "grep pve /boot/grub/grub.cfg"
+  register: proxmox_installed
+  ignore_errors: true
+  changed_when: false
+
+- name: Ensure has an entry in /etc/hosts which assigns an IPv4 address.
+  lineinfile: >
+    state=present dest=/etc/hosts
+    regexp='^{{ proxmox_eth0_ipv4 | default(ansible_default_ipv4.address)}}'
+    line='{{ proxmox_eth0_ipv4 | default(ansible_default_ipv4.address) }} {{ ansible_hostname }} pvelocalhost'
+  when: (proxmox_installed.stdout is not defined) or (proxmox_installed.stdout == '')
+
+- name: Ensure hostname is not on the same line of localhost
+  lineinfile: >
+    state=absent
+    dest=/etc/hosts
+    regexp='^127(.*){{ ansible_hostname }}'
+    backup=true
+  when: (proxmox_installed.stdout is not defined) or (proxmox_installed.stdout == '')
+
+- name: Ensure hostname is not on an ipv6 line
+  lineinfile: >
+    state=present
+    dest=/etc/hosts
+    backrefs=true
+    regexp='(.*::.*){{ ansible_hostname }}(.*)'
+    line="\1\2"
+    backup=true

@@ -1,0 +1,3 @@
+ALLOW_FROM="{{ proxmox_pveproxy_allow_from }}"
+DENY_FROM="all"
+POLICY="allow"

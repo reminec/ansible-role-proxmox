@@ -16,7 +16,23 @@ proxmox_template_path: "/var/lib/vz/template/cache"
 
 proxmox_templates:
   - { filename: 'debian-7.0-standard_7.0-2_amd64.tar.gz', 
-      url: 'ftp://download.proxmox.com/appliances/system/debian-7.0-standard_7.0-2_amd64.tar.gz',
+      url: 'http://download.proxmox.com/appliances/system/debian-7.0-standard_7.0-2_amd64.tar.gz',
       sha256sum: '1d114375beb93940ad296e64d3c1ddfc14d35fb00dfdf40c8eb4f4b70496b3c5' }
 
+proxmox_storages: []
 pve_containers: []
+
+proxmox_cluster_master_fqdn: ''
+proxmox_cluster: false
+proxmox_cluster_master: false
+proxmox_cluster_name: ''
+proxmox_cluster_conf: []
+
+
+
+
+
+proxmox_cluster_nodes: []
+proxmox_cluster_internal_ipv4: ''
+
+proxmox_pveproxy_allow_from: '127.0.0.1'

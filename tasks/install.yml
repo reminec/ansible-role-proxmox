@@ -1,32 +1,12 @@
 ---
 # install proxmox VE (part 1)
 #
+- name: check if already installed
+  shell: "grep pve /boot/grub/grub.cfg"
+  register: proxmox_installed
+  ignore_errors: true
+  changed_when: false
 
-- name: Ensure has an entry in /etc/hosts which assigns an IPv4 address. 
-  lineinfile: >
-    state=present dest=/etc/hosts
-    regexp='^{{ proxmox_eth0_ipv4 | default(ansible_default_ipv4.address)}}'
-    line='{{ proxmox_eth0_ipv4 | default(ansible_default_ipv4.address) }} {{ ansible_hostname }} pvelocalhost'
-
-- name: Ensure hostname is not on the same line of localhost
-  lineinfile: >
-    state=absent 
-    dest=/etc/hosts
-    regexp='^127(.*){{ ansible_hostname }}'
-    backup=true
-  tags:
-    - hosts
-
-- name: Ensure hostname is not on an ipv6 line
-  lineinfile: >
-    state=present 
-    dest=/etc/hosts
-    backrefs=true
-    regexp='(.*::.*){{ ansible_hostname }}(.*)'
-    line="\1\2"
-  tags:
-    - hosts
-  
 - name: add the Proxmox VE repository
   lineinfile: "state=present dest=/etc/apt/sources.list
   regexp='^deb http://download.proxmox.com'
@@ -35,14 +15,6 @@
 
 - name: add the Proxmox VE repository key
   apt_key: url=http://download.proxmox.com/debian/key.asc state=present
-
-- name: check if already installed
-  shell: "grep pve /boot/grub/grub.cfg"
-  register: proxmox_installed
-  ignore_errors: true
-  changed_when: false
-
-- debug: var=proxmox_installed
 
 - name: run sysupgrade
   apt: update_cache=yes upgrade=dist cache_valid_time=600
@@ -106,31 +78,4 @@
   tags:
     - after-reboot
 
-- name: install default template(s)
-  get_url:
-    url="{{ item.url }}"
-    dest="{{ proxmox_template_path }}/{{ item.filename }}"
-    sha256sum="{{ item.sha256sum }}"
-  with_items: proxmox_templates
-  tags:
-    - after-reboot
-
-- name: ensure pve-enterprise repo is disable (need a valid subscription) 
-  synchronize: src="etc-apt-sources.list.d/pve-enterprise.list" dest="/etc/apt/sources.list.d/pve-enterprise.list"
-  tags:
-    - after-reboot
-
-- name: Modprobe some modules to enable firewall in containers 
-  shell: 'modprobe xt_tcpudp && modprobe ip_conntrack' 
-  tags:
-    - after-reboot
-
-- name: Add ipt_state to iptables modules in vz.conf
-  lineinfile: >
-    state=present 
-    dest=/etc/vz/vz.conf
-    regexp='^IPTABLES='
-    line='IPTABLES="ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length ipt_state"'
-  tags:
-    - after-reboot 
 
