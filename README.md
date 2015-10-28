@@ -8,7 +8,7 @@ Install proxmox on a fresh debian Weezie (Debian 7) , reboot it, and :
 By default, disable proxmox pve-enterprise sources.list because we works with no subscription
 
 ## Requirements
-
+- Ansible 1.7.2+
 - library/pvectl/pvectl [https://github.com/reminec/ansible-library-pvectl]
 - library/xml/xml [https://github.com/cmprescott/ansible-xml]
 
