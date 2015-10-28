@@ -54,7 +54,7 @@ Actually only tested for create a simple 2nodes cluster
 # Cluster
 proxmox_cluster: true # Enable cluster tasks
 proxmox_cluster_master: true # The cluster will be created from the current host
-proxmox_cluster_master_fqdn: proxmox.reminec.fr # Specify the reverse hostname for external ipv4
+proxmox_cluster_master_fqdn: proxmox.example.com # Specify the reverse hostname for external ipv4
 proxmox_cluster_name: myCluster 
 proxmox_cluster_internal_ipv4: 10.1.1.1 # Private address used by cluster
 
@@ -69,7 +69,7 @@ proxmox_cluster_nodes:
   - hostname: proxmox2 # Short hostname
     ipv4: 10.1.1.2 # Private address used by cluster
     external_ipv4: 1.2.3.4 
-    fqdn: proxmox2.example.fr # Specify the reverse hostname for external ipv4
+    fqdn: proxmox2.example.com # Specify the reverse hostname for external ipv4
     
 # You need to restric pveproy for your private network
 proxmox_restrict_webadmin: true
@@ -105,9 +105,9 @@ proxmox_templates: # Define templates which you want download and store on proxm
          - reminec.proxmox
 
 ## References
-http://openvz.org/Setting_up_an_iptables_firewall#Setting_up_a_firewall_that_allows_per-container_configuration
-https://blog.elao.com/fr/infra/creer-un-cluster-2-nodes-proxmox/
-http://www.nedproductions.biz/wiki/configuring-a-proxmox-ve-2.x-cluster-running-over-an-openvpn-intranet
+- http://openvz.org/Setting_up_an_iptables_firewall#Setting_up_a_firewall_that_allows_per-container_configuration
+- https://blog.elao.com/fr/infra/creer-un-cluster-2-nodes-proxmox/
+- http://www.nedproductions.biz/wiki/configuring-a-proxmox-ve-2.x-cluster-running-over-an-openvpn-intranet
 
 ## License
 MIT - [See LICENSE](LICENSE)
