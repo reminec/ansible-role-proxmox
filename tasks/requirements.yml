@@ -27,3 +27,5 @@
     regexp='(.*::.*){{ ansible_hostname }}(.*)'
     line="\1\2"
     backup=true
+
+# todo: INstaller pip & pip install proxmoxer,requests,lxml

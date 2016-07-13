@@ -1,0 +1,25 @@
+---
+# Create openvz containers
+
+- name: "create a lxc container"
+  proxmox: >
+    vmid={{ item.vmid }}
+    api_host={{ item.api_host }}
+    api_user={{ item.api_user }}
+    api_password={{ item.api_password | default(omit) }}
+    hostname={{ item.hostname | default(omit)}}
+    node={{ item.node | default(omit) }}
+    password={{ item.password | default(omit) }}
+    ip_address={{ item.ip_address | default(omit) }}
+    netif={{ item.netif | default(omit) }}
+    mounts={{ item.mounts | default(omit) }}
+    memory={{ item.memory | default(omit) }}
+    swap={{ item.swap | default(omit) }}
+    ostemplate={{ item.ostemplate | default(omit) }}
+    onboot={{ item.onboot | default(omit) }}
+    state={{ item.state | default(omit) }}
+    cpus={{ item.cpus | default(omit)}}
+    cpuunits={{ item.cpuunits | default(omit)}}
+    disk={{ item.disk | default(omit) }}
+  with_items: "{{ proxmox_containers }}"
+  register: ct_create

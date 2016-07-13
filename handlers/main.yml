@@ -5,8 +5,3 @@
   service: 
     name="pveproxy"
     state="restarted"
-
-- name: cluster restart
-  service: >
-    name="pve-cluster"
-    state="restarted"

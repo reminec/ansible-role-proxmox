@@ -2,16 +2,28 @@
 # install proxmox VE (part 1)
 #
 
-- include: requirements.yml tags=proxmox
-- include: install.yml tags=proxmox,proxmox_install
-- include: configure.yml tags=proxmox,proxmox_configure
-- include: securize.yml tags=proxmox,proxmox_securize
+- include: requirements.yml
+  tags:
+    - proxmox_install
+    - proxmox_configure
+
+- include: install.yml
+  tags:
+    - proxmox_install
+
+- include: configure.yml
+  tags:
+    - proxmox_configure
+
+- include: securize.yml
+  tags:
+    - proxmox_securize
   when: proxmox_restrict_webadmin | default(false)
-- include: cluster_vpn_master.yml tags=proxmox,proxmox_cluster,proxmox_cluster_master
-  when: proxmox_cluster
-- include: cluster_vpn_node.yml tags=proxmox,proxmox_cluster,proxmox_cluster_node
-  when: proxmox_cluster
-- include: create_cluster.yml tags=proxmox,proxmox_cluster,proxmox_create_cluster
-  when: proxmox_cluster
-- include: storage.yml tags=proxmox,proxmox_storage
-- include: openvz.yml tags=proxmox,proxmox_openvz
+
+- include: storage.yml
+  tags:
+    - proxmox_storage
+
+- include: containers.yml
+  tags:
+    - proxmox_containers

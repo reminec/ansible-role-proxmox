@@ -1,33 +1,19 @@
-- name: install default template(s)
-  get_url:
-    url="{{ item.url }}"
-    dest="{{ proxmox_template_path }}/{{ item.filename }}"
-  with_items: proxmox_templates
-  tags:
-    - after-reboot
-
 - name: ensure pve-enterprise repo is disable (need a valid subscription)
-  synchronize: src="etc-apt-sources.list.d/pve-enterprise.list" dest="/etc/apt/sources.list.d/pve-enterprise.list"
+  file: path="/etc/apt/sources.list.d/pve-enterprise.list" state="absent"
   tags:
     - after-reboot
 
 - name: Modprobe some modules to enable firewall in containers
-  shell: 'modprobe xt_tcpudp && modprobe ip_conntrack'
+  shell: 'modprobe xt_tcpudp && modprobe ip_conntrack && modprobe xt_multiport && modprobe xt_connlimit && modprobe xt_owner'
   tags:
     - after-reboot
 
-- name: Add ipt_state to iptables modules in vz.conf
-  lineinfile: >
-    state=present
-    dest=/etc/vz/vz.conf
-    regexp='^IPTABLES='
-    line='IPTABLES="ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length ipt_state"'
-  tags:
-    - after-reboot
+- name: Configure network interfaces (need reboot if changes)
+  template:
+    src:  "{{ proxmox_interfaces_template }}"
+    dest: "{{ proxmox_interfaces_file }}"
+  when: proxmox_interfaces_template | length
 
-- name: vz config > setup NEIGHBOUR_DEVS
-  lineinfile: "state=present dest=/etc/vz/vz.conf
-    regexp='^NEIGHBOUR_DEVS'
-    line='NEIGHBOUR_DEVS=eth0'
-    backup=true"
-
+- name: Install proxmoxer and requests
+  pip: name='{{ item }}'
+  with_items: '{{ proxmox_pip_packages }}'

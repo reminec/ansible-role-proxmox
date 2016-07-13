@@ -2,7 +2,7 @@
 # install proxmox VE (part 1)
 #
 - name: check if already installed
-  shell: "grep pve /boot/grub/grub.cfg"
+  shell: "grep -i proxmox /boot/grub/grub.cfg"
   register: proxmox_installed
   ignore_errors: true
   changed_when: false
@@ -10,7 +10,7 @@
 - name: add the Proxmox VE repository
   lineinfile: "state=present dest=/etc/apt/sources.list
   regexp='^deb http://download.proxmox.com'
-  line='deb http://download.proxmox.com/debian wheezy pve'
+  line='deb http://download.proxmox.com/debian jessie pve-no-subscription'
   backup=true"
 
 - name: add the Proxmox VE repository key
@@ -19,24 +19,10 @@
 - name: run sysupgrade
   apt: update_cache=yes upgrade=dist cache_valid_time=600
   when: (proxmox_installed.stdout is not defined) or (proxmox_installed.stdout == '')
- 
-- name: install proxmox VE firmware
-  apt: pkg=pve-firmware state=latest update_cache=yes
 
-- name: install proxmox VE kernel
-  apt: pkg=pve-kernel-2.6.32-26-pve state=latest
-
-- name: set default boot to VE kernel
-  lineinfile: 
-    state=present 
-    dest=/etc/default/grub
-    regexp='^GRUB_DEFAULT='
-    line="GRUB_DEFAULT='Debian GNU/Linux, with Linux 2.6.32-26-pve'"
-    backup=true
-
-- name: update grub
-  command: update-grub
-  when: (proxmox_installed.stdout is not defined) or (proxmox_installed.stdout == '')
+- name: install packages for Proxmox VE
+  apt: pkg='{{ item }}' state=present
+  with_items: proxmox_base_packages
 
 - name: setup IPV4 forwarding for NAT
   lineinfile: "state=present dest=/etc/sysctl.conf
@@ -47,18 +33,13 @@
 
 - name: reboot machine
   command: shutdown -r now "Ansible updates triggered"
-  async: 0
+  async: 1
   poll: 0
   ignore_errors: true
   when: (proxmox_installed.stdout is not defined) or (proxmox_installed.stdout == '')
 
-- name: wait for shutdown...
-  local_action: wait_for host={{ inventory_hostname }} port=22 state=stopped 
-  when: (proxmox_installed.stdout is not defined) or (proxmox_installed.stdout == '')
-
-- name: wait until SSH becomes ready...
-  local_action: wait_for host={{ inventory_hostname }} state=started
-  sudo: false
+- name: Waiting reboot...
+  local_action: wait_for host={{ inventory_hostname }} state=started delay=30 timeout=300
   when: (proxmox_installed.stdout is not defined) or (proxmox_installed.stdout == '')
 
 - name: is it running?
@@ -66,16 +47,5 @@
   register: uptime_result
   changed_when: (uptime_result.stdout is not defined) or (uptime_result.stdout == '')
   when: (proxmox_installed.stdout is not defined) or (proxmox_installed.stdout == '')
-
-- name: install dependency packages for PVE
-  apt: pkg={{ item }} state=present
-  with_items: proxmox_base_packages
-  tags:
-    - after-reboot
-
-- name: install dependency packages for PVE
-  apt: pkg=proxmox-ve-2.6.32 state=present
-  tags:
-    - after-reboot
 
 

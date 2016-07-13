@@ -1,24 +1,23 @@
 # Reminec Ansible Role Proxmox
 
-Install proxmox on a fresh debian Weezie (Debian 7) , reboot it, and :
- - Ability to create a simple 2nodes cluster
+ - Install proxmox on a fresh debian jessie (Debian 8) 
+ - reboot machine
  - Create storages from configuration
  - Create containers from configuration
  
-By default, disable proxmox pve-enterprise sources.list because we works with no subscription
+By default, disable proxmox pve-enterprise sources.list because we works with no subscription    
 
 ## Requirements
-- Ansible 1.7.2+
-- library/pvectl/pvectl [https://github.com/reminec/ansible-library-pvectl]
-- library/xml/xml [https://github.com/cmprescott/ansible-xml]
+- Should work with Ansible 1.7.2+ | 2.0 otherwise
 
 ## Role Variables
 
-### Configuration example - 1 Proxmox instance
+### Configuration example
 ```yaml
 # General
 proxmox_restrict_webadmin: true
-proxmox_pveproxy_allow_from: '127.0.0.1'
+proxmox_pveproxy_allow_from: '127.0.0.1' # Can be '10.0.0.0/24'
+
 
 # ProxMox - Storage
 proxmox_storages:
@@ -30,50 +29,23 @@ proxmox_storages:
     nodes: myProxmoxHostname # hostname
     
 # Specify a container
-pve_containers:
-  - ctid: 101
-    hostname: 'vztest'
-    ip_address: '10.10.10.2'
-    memory: '8192'
-    swap: '512'
-    ostemplate: "{{ proxmox_template_path }}/debian-7.0-standard_7.0-2_amd64.tar.gz"
-    # nameserver: '10.10.10.1'
-    # searchdomain:
-    onboot: 'yes'
-    disk: '50'
-    password: 'changeMe'
-    cpus: 4
-    cpuunits: 2000
-```
-### Configuration example - 2 nodes cluster (Work in Progress)
-This role provide some task to create cluster from your current host, and add automatically nodes to the cluster by delegate task   
-Actually only tested for create a simple 2nodes cluster
-```yaml
-# ... Copy here configuration example from 1 proxmox instance
-
-# Cluster
-proxmox_cluster: true # Enable cluster tasks
-proxmox_cluster_master: true # The cluster will be created from the current host
-proxmox_cluster_master_fqdn: proxmox.example.com # Specify the reverse hostname for external ipv4
-proxmox_cluster_name: myCluster 
-proxmox_cluster_internal_ipv4: 10.1.1.1 # Private address used by cluster
-
-# Configure /etc/pve/cluster.conf - Only works for a 2nodes cluster
-proxmox_cluster_conf:
-  config_version: 4
-  two_node: 1
-  expected_votes: 1
-
-# Other proxmox instances will be added to the cluster
-proxmox_cluster_nodes:
-  - hostname: proxmox2 # Short hostname
-    ipv4: 10.1.1.2 # Private address used by cluster
-    external_ipv4: 1.2.3.4 
-    fqdn: proxmox2.example.com # Specify the reverse hostname for external ipv4
-    
-# You need to restric pveproy for your private network
-proxmox_restrict_webadmin: true
-proxmox_pveproxy_allow_from: '10.1.1.0/24'
+proxmox_containers:
+  - vmid: 112
+      api_host: '{{ proxmox_api_host }}'
+      api_user: root@pam
+      api_password: '{{ proxmox_api_password }}'
+      node: 'proxmox2'
+      hostname: 'test.example.me'
+      netif: '{"net0":"name=eth0,bridge=vmbr2,gw=10.0.0.1,ip=10.0.0.13/16"}'
+      memory: '2048'
+      swap: '512'
+      ostemplate: "local:vztmpl/debian-8.0-standard_8.0-1_amd64.tar.gz"
+      onboot: 'yes'
+      disk: '10'
+      password: 'YourRootPasswordHere'
+      cpus: 2
+      cpuunits: 3000
+      state: 'present'
 ```
 
 ### Optional vars
@@ -81,21 +53,54 @@ proxmox_pveproxy_allow_from: '10.1.1.0/24'
 ```yaml
 
 proxmox_base_packages: # Install with apt manager
+  - proxmox-ve
   - ntp
-  - lvm2
-  - postfix 
-  - ksm-control-daemon 
-  - vzprocps 
-  - open-iscsi 
-  - bootlogd
+  - ssh
+  - postfix
+  - ksm-control-daemon
+  - open-iscsi
+  - systemd-sysv
+  
+# Network
+proxmox_interfaces_template: my_template_path/interfaces.new.j2 # Modify /etc/network/interfaces.new use by proxmox on next reboot
+```
 
-proxmox_template_path: "/var/lib/vz/template/cache" # Where proxmox store templates
+*/etc/network/interfaces.new* - Example with an OVH dedicated server:
+```
+auto lo
+iface lo inet loopback
 
-proxmox_templates: # Define templates which you want download and store on proxmox
-  - { filename: 'debian-7.0-standard_7.0-2_amd64.tar.gz', 
-      url: 'ftp://download.proxmox.com/appliances/system/debian-7.0-standard_7.0-2_amd64.tar.gz',
-      sha256sum: '1d114375beb93940ad296e64d3c1ddfc14d35fb00dfdf40c8eb4f4b70496b3c5' }
+auto vmbr0
+iface vmbr0 inet static
+    address w.x.y.z # PUBLIC IP
+    netmask 255.255.255.0
+    network w.x.y.0 
+    broadcast w.x.y.255
+    gateway w.x.y.1
+    bridge_ports eth0
+    bridge_stp off
+    bridge_fd 0
 
+auto vmbr2
+iface vmbr2 inet static
+    address 10.0.0.1
+    netmask 255.255.0.0
+    bridge_ports none
+    bridge_stp off
+    bridge_fd 0
+    post-up echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# If you use OpenVPN on the host
+auto openvpnbr0
+iface openvpnbr0 inet static
+        address 10.1.0.1
+        netmask 255.255.0.0
+        network 10.1.0.0
+        broadcast 10.1.255.255
+        bridge_ports dummy1
+        bridge_stp off
+        bridge_fd 0
+        post-up route add -net 224.0.0.0 netmask 240.0.0.0 dev openvpnbr0
 ```
 
 ## Example Playbook
@@ -103,11 +108,6 @@ proxmox_templates: # Define templates which you want download and store on proxm
     - hosts: proxmox
       roles:
          - reminec.proxmox
-
-## References
-- http://openvz.org/Setting_up_an_iptables_firewall#Setting_up_a_firewall_that_allows_per-container_configuration
-- https://blog.elao.com/fr/infra/creer-un-cluster-2-nodes-proxmox/
-- http://www.nedproductions.biz/wiki/configuring-a-proxmox-ve-2.x-cluster-running-over-an-openvpn-intranet
 
 ## License
 MIT - [See LICENSE](LICENSE)
