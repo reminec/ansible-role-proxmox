@@ -8,7 +8,7 @@
 By default, disable proxmox pve-enterprise sources.list because we works with no subscription    
 
 ## Requirements
-- Should work with Ansible 1.7.2+ | 2.0 otherwise
+- Ansible > 2.0
 
 ## Role Variables
 
