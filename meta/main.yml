@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Reminec
-  description: 
+  description: Install Proxmox 4 on a fresh Debian Jessie. Manage storages & containers
   company: reminec
   license: MIT
   min_ansible_version: 2.0
