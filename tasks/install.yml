@@ -24,6 +24,9 @@
   apt: pkg='{{ item }}' state=present
   with_items: proxmox_base_packages
 
+- name: remove unused os-prober
+  apt: pkg=os-prober state=absent
+
 - name: setup IPV4 forwarding for NAT
   lineinfile: "state=present dest=/etc/sysctl.conf
   regexp='^#?net.ipv4.ip_forward'
