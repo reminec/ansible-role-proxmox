@@ -4,7 +4,8 @@
     - after-reboot
 
 - name: Modprobe some modules to enable firewall in containers
-  shell: 'modprobe xt_tcpudp && modprobe ip_conntrack && modprobe xt_multiport && modprobe xt_connlimit && modprobe xt_owner'
+  modprobe: name='{{ item }}'
+  with_items: '{{ proxmox_modules }}'
   tags:
     - after-reboot
 

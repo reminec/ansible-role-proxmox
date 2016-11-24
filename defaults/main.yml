@@ -17,10 +17,27 @@ proxmox_pip_packages:
   - requests
   - proxmoxer
 
+proxmox_modules:
+  - 'xt_tcpudp'
+  - 'xt_multiport'
+
 proxmox_storages: []
+
+proxmox_lvg_iscsi_config: []
+
 proxmox_containers: []
 
 proxmox_interfaces_file:     /etc/network/interfaces.new
 proxmox_interfaces_template: ''
 
 proxmox_pveproxy_allow_from: '127.0.0.1'
+
+proxmox_isci_config_template: 'etc-iscsi/iscsid.conf.j2'
+proxmox_isci_config_path: '/etc/iscsi/iscsid.conf'
+proxmox_isci_config:
+  noop_out_interval: 5
+  noop_out_timeout: 5
+  replacement_timeout: 120
+  startup: 'manual'
+  HeaderDigest: 'None'
+  DataDigest: 'None'

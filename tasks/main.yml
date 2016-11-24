@@ -20,6 +20,10 @@
     - proxmox_securize
   when: proxmox_restrict_webadmin | default(false)
 
+- include: iscsi.yml
+  tags:
+    - proxmox_iscsi
+
 - include: storage.yml
   tags:
     - proxmox_storage

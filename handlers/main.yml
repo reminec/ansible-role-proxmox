@@ -5,3 +5,8 @@
   service: 
     name="pveproxy"
     state="restarted"
+
+- name: open-iscsi restart
+  service:
+    name: 'open-iscsi'
+    state: 'restarted'

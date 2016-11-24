@@ -1,0 +1,20 @@
+###########################################################################
+# Heavily inspired by https://github.com/ElaoInfra/ansible-role-openvz.git
+###########################################################################
+
+- name: storages > Setup storages
+  command: >
+    pvesm add {{ item.type }} {{ item.id }}
+    {{ (' -maxfiles ' ~ item.maxfiles) if (item.maxfiles is defined) else '' }}
+    {{ (' -server ' ~ item.server) if (item.server is defined) else '' }}
+    {{ (' -export ' ~ item.export) if (item.export is defined) else '' }}
+    {{ (' -content ' ~ item.content) if (item.content is defined) else '' }}
+    {{ (' -nodes ' ~ item.nodes) if (item.nodes is defined) else '' }}
+    {{ (' -path ' ~ item.path) if (item.path is defined) else '' }}
+    {{ (' -portal ' ~ item.portal) if (item.portal is defined) else '' }}
+    {{ (' -target ' ~ item.target) if (item.target is defined) else '' }}
+    {{ ('-base "' ~ item.base ~ '"') if (item.base is defined) else '' }}
+    {{ (' -vgname ' ~ item.vgname) if (item.vgname is defined) else '' }}
+  register: command_result
+  failed_when: "command_result.rc != 0 and 'already defined' not in command_result.stderr"
+  changed_when: "command_result.rc == 0"

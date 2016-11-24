@@ -1,0 +1,6 @@
+---
+- name: Setup open-iscsi configuration
+  template:
+    src="{{ proxmox_isci_config_template }}"
+    dest="{{ proxmox_isci_config_path }}"
+  notify: open-iscsi restart

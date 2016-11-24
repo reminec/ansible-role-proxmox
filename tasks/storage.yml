@@ -2,16 +2,18 @@
 ###########################################################################
 # Heavily inspired by https://github.com/ElaoInfra/ansible-role-openvz.git
 ###########################################################################
-- name: storages > Setup storages
-  command: >
-    pvesm add {{ item.type }} {{ item.id }}
-    -maxfiles {{ item.maxfiles|default(1) }}
-    {{ (' -server ' ~ item.server) if (item.server is defined) else '' }}
-    {{ (' -export ' ~ item.export) if (item.export is defined) else '' }}
-    {{ (' -content ' ~ item.content) if (item.content is defined) else '' }}
-    {{ (' -nodes ' ~ item.nodes) if (item.nodes is defined) else '' }}
-    {{ (' -path ' ~ item.path) if (item.path is defined) else '' }}
+- name: storage > Setup storages (except LVM)
+  include: pvesm.yml
   with_items: '{{ proxmox_storages }}'
-  register: command_result
-  failed_when: "command_result.rc != 0 and 'already defined' not in command_result.stderr"
-  changed_when: "command_result.rc == 0"
+  when: item.type != 'lvm'
+
+- name: storage > Setup LVM Volum Group on isci target
+  lvg:
+    vg: 'VGsan-ha-1TB'
+    pvs: '/dev/sdd'
+  with_items: proxmox_lvg_iscsi_config
+
+- name: storage > Setup storages (Only LVM)
+  include: pvesm.yml
+  with_items: '{{ proxmox_storages }}'
+  when: item.type == 'lvm'

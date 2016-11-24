@@ -22,7 +22,7 @@
 
 - name: install packages for Proxmox VE
   apt: pkg='{{ item }}' state=present
-  with_items: proxmox_base_packages
+  with_items: '{{ proxmox_base_packages }}'
 
 - name: remove unused os-prober
   apt: pkg=os-prober state=absent
