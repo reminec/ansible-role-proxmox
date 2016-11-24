@@ -21,5 +21,6 @@
     cpus={{ item.cpus | default(omit)}}
     cpuunits={{ item.cpuunits | default(omit)}}
     disk={{ item.disk | default(omit) }}
+    storage={{ item.storage | default(omit) }}
   with_items: "{{ proxmox_containers }}"
   register: ct_create
