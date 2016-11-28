@@ -8,7 +8,7 @@
   lineinfile: >
     state=present dest=/etc/hosts
     regexp='^{{ proxmox_eth0_ipv4 | default(ansible_default_ipv4.address)}}'
-    line='{{ proxmox_eth0_ipv4 | default(ansible_default_ipv4.address) }} {{ ansible_hostname }} pvelocalhost'
+    line='{{ proxmox_eth0_ipv4 | default(ansible_default_ipv4.address) }} {{ proxmox_fqdn ~ ' ' | default('')}}{{ ansible_hostname }} pvelocalhost'
   when: (proxmox_installed.stdout is not defined) or (proxmox_installed.stdout == '')
 
 - name: Ensure hostname is not on the same line of localhost
