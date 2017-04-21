@@ -9,9 +9,9 @@
 
 - name: storage > Setup LVM Volum Group on isci target
   lvg:
-    vg: 'VGsan-ha-1TB'
-    pvs: '/dev/sdd'
-  with_items: proxmox_lvg_iscsi_config
+    vg: item.vg
+    pvs: item.pvs
+  with_items: '{{ proxmox_lvg_iscsi_config }}'
 
 - name: storage > Setup storages (Only LVM)
   include: pvesm.yml
